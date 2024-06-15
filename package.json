@@ -1,0 +1,12 @@
+{
+  "name": "kinda-realistic-flashlight",
+  "version": "1.0.0",
+  "description": "👉 [See details](https://www.nexusmods.com/cyberpunk2077/mods/12559)",
+  "main": "init.lua",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["cyberpunk", "mod", "flashlight", "realistic"],
+  "author": "Bahrican Akkoyun",
+  "license": "https://www.nexusmods.com/cyberpunk2077/mods/12559"
+}

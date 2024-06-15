@@ -1,0 +1,6 @@
+# see: https://github.com/github/gitignore
+
+*.sqlite3
+*.log
+
+private/
