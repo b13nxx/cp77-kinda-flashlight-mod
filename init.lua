@@ -23,7 +23,7 @@ private = {
 
   flashlightID = nil,
   flashlight = nil,
-  flashlightPath = [[base\gameplay\devices\lighting\industrial\spotlight\spotlight_d_lamp_a.ent]],
+  flashlightPath = [[base\gameplay\devices\lighting\industrial\spotlight\spotlight_d_lamp_a_glen_overhang.ent]],
 
   flashlightStatus = FlashlightStatus.DESPAWNED,
   lightStatus = LightStatus.OFF,
@@ -32,7 +32,9 @@ private = {
   disableFlashlightVisib = true,
 
   radioTurnOnSoundName = nil,
-  tvTurnOnSoundName = nil
+  tvTurnOnSoundName = nil,
+
+  passedTime = 0
 }
 
 function checkIfSessionStarted()
@@ -139,8 +141,9 @@ function despawnFlashlight()
 
     exEntitySpawner.Despawn(private.flashlight)
 
-    private.flashlight = nil
     private.flashlightID = nil
+    private.flashlight = nil
+    private.drawnWeapon = nil
 
     private.lightStatus = LightStatus.OFF
     private.flashlightStatus = FlashlightStatus.DESPAWNED
@@ -185,9 +188,15 @@ registerForEvent('onInit', function()
   --print('KRF is initialized!')
 end)
 
-registerForEvent('onUpdate', function()
-  findFlashlightEntity()
-  moveFlashlight()
+registerForEvent('onUpdate', function(delta)
+  private.passedTime = private.passedTime + delta
+
+  if private.passedTime > 0.033 then
+    private.passedTime = 0
+
+    findFlashlightEntity()
+    moveFlashlight()
+  end
 end)
 
 registerInput('switch_flashlight', 'Switch Flashlight', function(keypress)
