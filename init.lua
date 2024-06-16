@@ -20,21 +20,18 @@ public = {
 
 private = {
   drawnWeapon = nil,
-
   flashlightID = nil,
   flashlight = nil,
-  flashlightPath = [[base\gameplay\devices\lighting\industrial\spotlight\spotlight_d_lamp_a_glen_overhang.ent]],
-
-  flashlightStatus = FlashlightStatus.DESPAWNED,
-  lightStatus = LightStatus.OFF,
-
-  disableFlashlightColl = true,
-  disableFlashlightVisib = true,
-
   radioTurnOnSoundName = nil,
   tvTurnOnSoundName = nil,
+  nativeSettings = nil,
 
-  passedTime = 0
+  passedTime = 0,
+  flashlightPath = [[base\gameplay\devices\lighting\industrial\spotlight\spotlight_d_lamp_a_glen_overhang.ent]],
+  flashlightStatus = FlashlightStatus.DESPAWNED,
+  lightStatus = LightStatus.OFF,
+  disableFlashlightColl = true,
+  disableFlashlightVisib = true
 }
 
 function checkIfSessionStarted()
@@ -79,16 +76,26 @@ end
 
 function getFlashlightSpawnPoint()
   if private.drawnWeapon == nil then
-    return nil
+    return
   end
 
-  local muzzleTransform = private.drawnWeapon:GetMuzzleSlotWorldTransform()
-  local muzzlePos = Transform.GetPosition(muzzleTransform)
-  local muzzleAngle = Transform.ToEulerAngles(muzzleTransform)
+  local spawnTransform = WorldTransform.new()
+  local spawnPos = nil
+  local spawnAngle = nil
 
-  local spawnTransform = private.drawnWeapon:GetWorldTransform()
-  local spawnPos = Vector4.new(muzzlePos.x, muzzlePos.y, muzzlePos.z - 0.1, muzzlePos.w)
-  local spawnAngle = EulerAngles.new(muzzleAngle.pitch, 0, muzzleAngle.yaw - 90)
+  if private.flashlightStatus == FlashlightStatus.SPAWNED then
+    local muzzleTransform = private.drawnWeapon:GetMuzzleSlotWorldTransform()
+    local muzzlePos = Transform.GetPosition(muzzleTransform)
+    local muzzleAngle = Transform.ToEulerAngles(muzzleTransform)
+
+    spawnPos = Vector4.new(muzzlePos.x, muzzlePos.y, muzzlePos.z - 0.1, muzzlePos.w)
+    spawnAngle = EulerAngles.new(muzzleAngle.pitch, 0, muzzleAngle.yaw - 90)
+  elseif private.flashlightStatus == FlashlightStatus.SPAWNING then
+    local playerPos = Game.GetPlayer():GetWorldPosition()
+
+    spawnPos = Vector4.new(playerPos.x, playerPos.y, playerPos.z - 5, playerPos.w)
+    spawnAngle = EulerAngles.new(0, 0, 0)
+  end
 
   WorldTransform.SetPosition(spawnTransform, spawnPos)
   WorldTransform.SetOrientationEuler(spawnTransform, spawnAngle)
@@ -133,30 +140,14 @@ function spawnFlashlight()
   end
 end
 
-function despawnFlashlight()
-  if private.flashlightStatus == FlashlightStatus.SPAWNED then
-    playTurnOffSound()
-
-    private.flashlightStatus = FlashlightStatus.DESPAWNING
-
-    exEntitySpawner.Despawn(private.flashlight)
-
-    private.flashlightID = nil
-    private.flashlight = nil
-    private.drawnWeapon = nil
-
-    private.lightStatus = LightStatus.OFF
-    private.flashlightStatus = FlashlightStatus.DESPAWNED
-  end
-end
-
-registerForEvent('onInit', function()
-  public.isReady = true
-
+function initReferences()
+  private.drawnWeapon = getActivePlayerWeapon()
   private.radioTurnOnSoundName = CName.new('ui_radio_turn_on')
   private.tvTurnOnSoundName = CName.new('ui_tv_turn_on')
-  private.drawnWeapon = getActivePlayerWeapon()
+  private.nativeSettings = GetMod("nativeSettings")
+end
 
+function initHooks()
   ObserveAfter('PlayerPuppet', 'OnWeaponEquipEvent', function(self)
     private.drawnWeapon = getActivePlayerWeapon()
 
@@ -184,6 +175,37 @@ registerForEvent('onInit', function()
       despawnFlashlight()
     end
   end)
+end
+
+function despawnFlashlight()
+  if private.flashlightStatus == FlashlightStatus.SPAWNED then
+    playTurnOffSound()
+
+    private.flashlightStatus = FlashlightStatus.DESPAWNING
+
+    exEntitySpawner.Despawn(private.flashlight)
+
+    private.flashlightID = nil
+    private.flashlight = nil
+    private.drawnWeapon = nil
+
+    private.lightStatus = LightStatus.OFF
+    private.flashlightStatus = FlashlightStatus.DESPAWNED
+  end
+end
+
+function destroyReferences ()
+  private.drawnWeapon = nil
+  private.radioTurnOnSoundName = nil
+  private.tvTurnOnSoundName = nil
+  private.nativeSettings = nil
+end
+
+registerForEvent('onInit', function()
+  public.isReady = true
+
+  initReferences()
+  initHooks()
 
   --print('KRF is initialized!')
 end)
@@ -218,6 +240,7 @@ end)
 
 registerForEvent('onShutdown', function()
   despawnFlashlight()
+  destroyReferences()
 end)
 
 return public
