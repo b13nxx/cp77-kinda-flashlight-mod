@@ -1,9 +1,11 @@
 --print('KRF is loaded!')
 
 require "core/enums"
+require "core/vector"
 require "core/utils/debug"
 require "core/utils/player"
 require "core/flashlight"
+require "core/settings"
 
 public = {
   isReady = false,
@@ -19,6 +21,10 @@ registerForEvent('onInit', function()
   public.isReady = true
 
   flashlight:init()
+  settings:init()
+
+  settings:load()
+  settings:draw()
 
   ObserveAfter('PlayerPuppet', 'OnWeaponEquipEvent', function(self)
     flashlight.drawnWeapon = player:getActivePlayerWeapon()
@@ -34,9 +40,7 @@ registerForEvent('onInit', function()
     flashlight:turnOff()
   end)
 
-  Observe('UpperBodyTransition', 'SetWeaponHolster', function (self, _scriptInterface, newState)
-    local isHolstered = newState
-
+  Observe('UpperBodyTransition', 'SetWeaponHolster', function (self, _scriptInterface, isHolstered)
     if isHolstered == true then
       flashlight:turnOff()
     end
@@ -58,6 +62,7 @@ registerForEvent('onUpdate', function(delta)
     private.passedTime = 0
 
     flashlight:findEntity()
+    flashlight:calibrate()
     flashlight:move()
   end
 end)
@@ -71,6 +76,7 @@ end)
 registerForEvent('onShutdown', function()
   flashlight:despawn()
   flashlight:destroy()
+  settings:destroy()
 end)
 
 return public

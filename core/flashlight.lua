@@ -1,3 +1,6 @@
+require "settings"
+require "vector"
+
 flashlight = {
   init = function (self)
     self.drawnWeapon = player:getActivePlayerWeapon()
@@ -64,8 +67,11 @@ flashlight = {
       local muzzleTransform = self.drawnWeapon:GetMuzzleSlotWorldTransform()
       local muzzlePos = Transform.GetPosition(muzzleTransform)
       local muzzleAngle = Transform.ToEulerAngles(muzzleTransform)
+      local forwardDir = vector:multiplyByScalar(self.drawnWeapon:GetWorldForward(), 0.1)
+      local upDir = vector:multiplyByScalar(self.drawnWeapon:GetWorldUp(), 0.2)
+      local direction = vector:add(forwardDir, upDir)
 
-      spawnPos = Vector4.new(muzzlePos.x, muzzlePos.y, muzzlePos.z - 0.1, muzzlePos.w)
+      spawnPos = vector:add(muzzlePos, direction)
       spawnAngle = EulerAngles.new(muzzleAngle.pitch, 0, muzzleAngle.yaw - 90)
     elseif self.entityStatus == FlashlightStatus.SPAWNING then
       local playerPos = Game.GetPlayer():GetWorldPosition()
@@ -135,6 +141,14 @@ flashlight = {
     if self.entityStatus == FlashlightStatus.SPAWNED then
       local spawnPoint = self:getSpawnPoint()
       Game.GetTeleportationFacility():Teleport(self.entity, spawnPoint.pos, spawnPoint.angle)
+    end
+  end,
+
+  calibrate = function (self)
+    if self.light ~= nil and self.lightStatus == LightStatus.ON then
+      self.light:SetRadius(settings.lightDistance)
+      self.light:SetStrength(settings.lightPower)
+      self.light:SetAngles(settings.lightBlend, settings.lightSize)
     end
   end,
 

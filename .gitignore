@@ -3,4 +3,6 @@
 *.sqlite3
 *.log
 
+settings.json
+
 private/
