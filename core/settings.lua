@@ -4,23 +4,23 @@ require "flashlight"
 
 settings = {
   init = function (self)
+    self.defaultLightDistance = 40
+    self.defaultLightSize = 40
+    self.defaultLightPowerPercent = 50
+    self.defaultLightBlendPercent = 80
+
+    self.lightDistance = self.defaultLightDistance
+    self.lightSize = self.defaultLightSize
+    self.lightPowerPercent = self.defaultLightPowerPercent
+    self.lightBlendPercent = self.defaultLightBlendPercent
+
+    self.lightPower = self:calcLightPower(self.defaultLightPowerPercent)
+    self.lightBlend = self:calcLightBlend(self.defaultLightPowerPercent, self.defaultLightBlendPercent)
+
     self.path = '/KRF'
-    self.lightDistance = 50
-    self.lightPower = 1
-    self.lightSize = 20
-    self.lightBlend = 20
-
     self.nativeSettings = GetMod('nativeSettings')
+
     self.nativeSettings.addTab(self.path, 'KRF (2.1)')
-  end,
-
-  calcLightDistance = function (self, percent)
-    local multiply = percent / 100
-    return toFixed(70 * multiply, 2)
-  end,
-
-  calcLightDistancePercent = function (self, distance)
-    return toPercent(distance / 70)
   end,
 
   calcLightPower = function (self, percent)
@@ -28,23 +28,14 @@ settings = {
     return toFixed(16 * multiply, 2)
   end,
 
-  calcLightPowerPercent = function (self, power)
-    return toPercent(power / 8)
-  end,
-
   calcLightBlend = function (self, size, percent)
     local multiply = percent / 100
     return size - math.floor(size * multiply)
   end,
 
-  calcLightBlendPercent = function (self, size, blend)
-    return toPercent((size - blend) / size)
-  end,
-
   draw = function (self)
-    self.nativeSettings.addRangeInt(self.path, "Distance", "How far light should travel", 10, 100, 5, self:calcLightDistancePercent(self.lightDistance), 70, function(value)
-      self.lightDistance = self:calcLightDistance(value)
-      print(self.lightDistance)
+    self.nativeSettings.addRangeInt(self.path, "Distance", "How far light should travel", 5, 70, 5, self.lightDistance, self.defaultLightDistance, function(value)
+      self.lightDistance = value
       self:save()
 
       if flashlight.light ~= nil then
@@ -52,7 +43,8 @@ settings = {
       end
     end)
 
-    self.nativeSettings.addRangeInt(self.path, "Power (%)", "How strong the light should be", 10, 100, 10, self:calcLightPowerPercent(self.lightPower), 50, function(value)
+    self.nativeSettings.addRangeInt(self.path, "Power (%)", "How strong the light should be", 2, 100, 2, self.lightPowerPercent, self.defaultLightPowerPercent, function(value)
+      self.lightPowerPercent = value
       self.lightPower = self:calcLightPower(value)
       self:save()
 
@@ -61,11 +53,9 @@ settings = {
       end
     end)
 
-    self.nativeSettings.addRangeInt(self.path, "Size", "How strong the light should be", 20, 50, 10, self.lightSize, 30, function(value)
-      local percent = self:calcLightBlendPercent(self.lightSize, self.lightBlend)
-
+    self.nativeSettings.addRangeInt(self.path, "Size", "How strong the light should be", 20, 50, 10, self.lightSize, self.defaultLightSize, function(value)
       self.lightSize = value
-      self.lightBlend = self:calcLightBlend(self.lightSize, percent)
+      self.lightBlend = self:calcLightBlend(self.lightSize, self.lightBlendPercent)
       self:save()
 
       if flashlight.light ~= nil then
@@ -73,7 +63,8 @@ settings = {
       end
     end)
 
-    self.nativeSettings.addRangeInt(self.path, "Blend (%)", "How strong the light should be", 40, 80, 80, self:calcLightBlendPercent(self.lightSize, self.lightBlend), 40, function(value)
+    self.nativeSettings.addRangeInt(self.path, "Blend (%)", "How strong the light should be", 40, 80, 10, self.lightBlendPercent, self.defaultLightBlendPercent, function(value)
+      self.lightBlendPercent = value
       self.lightBlend = self:calcLightBlend(self.lightSize, value)
       self:save()
 
@@ -102,6 +93,9 @@ settings = {
           self[key] = value
         end
       end
+
+      self.lightPower = self:calcLightPower(self.lightPowerPercent)
+      self.lightBlend = self:calcLightBlend(self.lightSize, self.lightBlendPercent)
     end
   end,
 
@@ -111,9 +105,9 @@ settings = {
     if file then
       file:write(json.encode({
         lightDistance = self.lightDistance,
-        lightPower = self.lightPower,
         lightSize = self.lightSize,
-        lightBlend = self.lightBlend
+        lightPowerPercent = self.lightPowerPercent,
+        lightBlendPercent = self.lightBlendPercent
       }))
 
       file:close()
