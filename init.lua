@@ -20,11 +20,11 @@ private = {
 registerForEvent('onInit', function()
   public.isReady = true
 
-  flashlight:init()
   settings:init()
-
   settings:load()
   settings:draw()
+
+  flashlight:init()
 
   ObserveAfter('PlayerPuppet', 'OnWeaponEquipEvent', function(self)
     flashlight.drawnWeapon = player:getActivePlayerWeapon()

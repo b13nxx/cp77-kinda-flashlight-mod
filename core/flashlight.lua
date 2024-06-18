@@ -146,9 +146,14 @@ flashlight = {
 
   calibrate = function (self)
     if self.light ~= nil and self.lightStatus == LightStatus.ON then
-      self.light:SetRadius(settings.lightDistance)
-      self.light:SetStrength(settings.lightPower)
-      self.light:SetAngles(settings.lightBlend, settings.lightSize)
+      local lightSettings = self.light:GetCurrentSettings()
+      local isDirty = lightSettings.strength ~= settings.lightPower or lightSettings.radius ~= settings.lightDistance or lightSettings.innerAngle ~= settings.lightBlend or lightSettings.outerAngle ~= settings.lightSize
+
+      if isDirty then
+        self.light:SetRadius(settings.lightDistance)
+        self.light:SetStrength(settings.lightPower)
+        self.light:SetAngles(settings.lightBlend, settings.lightSize)
+      end
     end
   end,
 
