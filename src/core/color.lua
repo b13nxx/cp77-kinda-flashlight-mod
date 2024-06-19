@@ -98,9 +98,15 @@ color = {
   end,
 
   getSelected = function(self)
-    return self.preset == 1 and
-      { red = self.selectedRed, green = self.selectedGreen, blue = self.selectedBlue } or
+    return utils:ternary(
+      self.preset == 1,
+      {
+        red = self.selectedRed,
+        green = self.selectedGreen,
+        blue = self.selectedBlue
+      },
       self:getByIndex(self.preset)
+    )
   end,
 
   getDefault = function(self)
@@ -119,9 +125,6 @@ color = {
   end,
 
   setRed = function(self, value)
-    print(value)
-    print(self.selectedGreen)
-    print(self.selectedBlue)
     local foundPreset = self:findIndexByRGB(value, self.selectedGreen, self.selectedBlue)
 
     self.selectedRed = value

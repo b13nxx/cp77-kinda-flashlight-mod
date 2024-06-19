@@ -1,3 +1,4 @@
+require 'src/core/utils'
 require 'src/core/debug'
 require 'src/core/enums'
 require 'src/core/color'
