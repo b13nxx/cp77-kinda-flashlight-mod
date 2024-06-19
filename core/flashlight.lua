@@ -1,5 +1,5 @@
-require "settings"
-require "vector"
+require 'settings'
+require 'vector'
 
 flashlight = {
   init = function (self)
@@ -147,12 +147,19 @@ flashlight = {
   calibrate = function (self)
     if self.light ~= nil and self.lightStatus == LightStatus.ON then
       local lightSettings = self.light:GetCurrentSettings()
-      local isDirty = lightSettings.strength ~= settings.lightPower or lightSettings.radius ~= settings.lightDistance or lightSettings.innerAngle ~= settings.lightBlend or lightSettings.outerAngle ~= settings.lightSize
+      local isLightStateDirty = lightSettings.strength ~= settings.lightPower or
+        lightSettings.radius ~= settings.lightDistance or
+        lightSettings.innerAngle ~= settings.lightBlend or
+        lightSettings.outerAngle ~= settings.lightSize or
+        lightSettings.color.Red ~= settings.lightColorRed or
+        lightSettings.color.Green ~= settings.lightColorGreen or
+        lightSettings.color.Blue ~= settings.lightColorBlue
 
-      if isDirty then
+      if isLightStateDirty then
         self.light:SetRadius(settings.lightDistance)
         self.light:SetStrength(settings.lightPower)
         self.light:SetAngles(settings.lightBlend, settings.lightSize)
+        self.light:SetColor(color:create(settings.lightColorRed, settings.lightColorGreen, settings.lightColorBlue))
       end
     end
   end,

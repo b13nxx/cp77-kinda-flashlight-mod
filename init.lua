@@ -1,16 +1,17 @@
 --print('KRF is loaded!')
 
-require "core/enums"
-require "core/vector"
-require "core/utils/debug"
-require "core/utils/player"
-require "core/flashlight"
-require "core/settings"
+require 'core/enums'
+require 'core/vector'
+require 'core/utils/debug'
+require 'core/utils/player'
+require 'core/flashlight'
+require 'core/color'
+require 'core/settings'
 
 public = {
   isReady = false,
   title = 'KRF',
-  version = '2.1'
+  version = '3.0'
 }
 
 private = {
@@ -20,7 +21,7 @@ private = {
 registerForEvent('onInit', function()
   public.isReady = true
 
-  settings:init()
+  settings:init(public.title, public.version)
   settings:load()
   settings:draw()
 
