@@ -1,12 +1,11 @@
---print('KRF is loaded!')
+require 'src/core/debug'
+require 'src/core/enums'
+require 'src/core/color'
+require 'src/core/vector'
+require 'src/core/player'
 
-require 'core/enums'
-require 'core/vector'
-require 'core/utils/debug'
-require 'core/utils/player'
-require 'core/flashlight'
-require 'core/color'
-require 'core/settings'
+require 'src/flashlight'
+require 'src/settings'
 
 public = {
   isReady = false,

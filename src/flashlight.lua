@@ -1,6 +1,3 @@
-require 'settings'
-require 'vector'
-
 flashlight = {
   init = function (self)
     self.drawnWeapon = player:getActivePlayerWeapon()
@@ -151,15 +148,13 @@ flashlight = {
         lightSettings.radius ~= settings.lightDistance or
         lightSettings.innerAngle ~= settings.lightBlend or
         lightSettings.outerAngle ~= settings.lightSize or
-        lightSettings.color.Red ~= settings.lightColorRed or
-        lightSettings.color.Green ~= settings.lightColorGreen or
-        lightSettings.color.Blue ~= settings.lightColorBlue
+        not color:isEqualTo(lightSettings.color)
 
       if isLightStateDirty then
-        self.light:SetRadius(settings.lightDistance)
-        self.light:SetStrength(settings.lightPower)
-        self.light:SetAngles(settings.lightBlend, settings.lightSize)
-        self.light:SetColor(color:create(settings.lightColorRed, settings.lightColorGreen, settings.lightColorBlue))
+        self:setDistance(settings.lightDistance)
+        self:setPower(settings.lightPower)
+        self:setSize(settings.lightSize, settings.lightBlend)
+        self:setColor(color:getSelected())
       end
     end
   end,
@@ -176,6 +171,30 @@ flashlight = {
       elseif self.entityStatus == FlashlightStatus.SPAWNED then
         self:despawn()
       end
+    end
+  end,
+
+  setDistance = function (self, distance)
+    if self.light ~= nil then
+      self.light:SetRadius(distance)
+    end
+  end,
+
+  setPower = function (self, power)
+    if self.light ~= nil then
+      self.light:SetStrength(power)
+    end
+  end,
+
+  setSize = function (self, size, blend)
+    if self.light ~= nil then
+      self.light:SetAngles(blend, size)
+    end
+  end,
+
+  setColor = function (self, targetColor)
+    if self.light ~= nil then
+      self.light:SetColor(color:builtFrom(targetColor.red, targetColor.green, targetColor.blue))
     end
   end
 }

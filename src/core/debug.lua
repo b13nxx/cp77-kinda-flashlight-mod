@@ -1,15 +1,3 @@
-function toFixed(value, digits)
-  return tonumber(string.format('%.' .. digits .. 'f', value))
-end
-
-function round(value)
-  return value + (2^52 + 2^51) - (2^52 + 2^51)
-end
-
-function toPercent(value)
-  return math.floor(value * 100)
-end
-
 function splitString(input, sep)
   local result = {}
   local start, last, nextStart = 1, 0, 0
