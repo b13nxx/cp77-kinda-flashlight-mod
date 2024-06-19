@@ -7,8 +7,6 @@ flashlight = {
     self.entityId = nil
     self.entity = nil
     self.light = nil
-    self.turnOnSoundCName = CName.new('ui_radio_turn_on')
-    self.turnOffSoundCName = CName.new('ui_tv_turn_on')
 
     self.path = [[base\gameplay\devices\lighting\industrial\spotlight\spotlight_d_lamp_a_glen_overhang.ent]]
     self.entityStatus = FlashlightStatus.DESPAWNED
@@ -25,8 +23,6 @@ flashlight = {
     self.entityId = nil
     self.entity = nil
     self.light = nil
-    self.turnOnSoundCName = nil
-    self.turnOffSoundCName = nil
   end,
 
   turnOn = function (self)
@@ -41,14 +37,6 @@ flashlight = {
       self.lightStatus = LightStatus.OFF
       self.entity:TurnOffLights()
     end
-  end,
-
-  playTurnOnSound = function (self)
-    GameObject.PlaySound(Game.GetPlayer(), self.turnOnSoundCName)
-  end,
-
-  playTurnOffSound = function (self)
-    GameObject.PlaySound(Game.GetPlayer(), self.turnOffSoundCName)
   end,
 
   getSpawnPoint = function (self)
@@ -89,7 +77,7 @@ flashlight = {
 
   spawn = function (self)
     if self.entityStatus == FlashlightStatus.DESPAWNED then
-      self:playTurnOnSound()
+      sound:playTurnOn()
 
       self.entityStatus = FlashlightStatus.SPAWNING
 
@@ -100,7 +88,7 @@ flashlight = {
 
   despawn = function (self)
     if self.entityStatus == FlashlightStatus.SPAWNED then
-      self:playTurnOffSound()
+      sound:playTurnOff()
 
       self.entityStatus = FlashlightStatus.DESPAWNING
 

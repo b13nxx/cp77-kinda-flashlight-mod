@@ -118,11 +118,11 @@ color = {
     return self:getByIndex(self.defaultPreset)
   end,
 
-  setPreset = function (self, value)
-    local color = self:getByIndex(value)
+  setPreset = function (self, index)
+    local color = self:getByIndex(index)
 
     if color ~= nil then
-      self.preset = value
+      self.preset = index
       self.selectedRed = color.red
       self.selectedGreen = color.green
       self.selectedBlue = color.blue

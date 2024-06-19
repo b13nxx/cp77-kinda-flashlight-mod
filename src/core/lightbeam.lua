@@ -40,21 +40,15 @@ lightBeam = {
   setSize = function (self, value)
     self.size = value
     self.blend = self:calcBlend(self.size, self.blendPercent)
-
-    print('blend', self.blend)
   end,
 
   setPowerPercent = function (self, percent)
     self.powerPercent = percent
     self.power = self:calcPower(self.powerPercent)
-
-    print('power', self.power)
   end,
 
   setBlendPercent = function (self, percent)
     self.blendPercent = percent
     self.blend = self:calcBlend(self.size, self.blendPercent)
-
-    print('blend', self.blend)
   end
 }

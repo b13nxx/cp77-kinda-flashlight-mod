@@ -2,6 +2,7 @@ settings = {
   init = function (self, title, version)
     lightBeam:init()
     color:init()
+    sound:init()
 
     self.filePath = 'settings.json'
     self.nativeSettings = GetMod('nativeSettings')
@@ -123,6 +124,20 @@ settings = {
 
       flashlight:setColor(color:getSelected())
     end)
+
+    self.nativeSettings.addSelectorString(self.path .. self.sections.sound.path, 'Turn On Preset', 'Description', sound:toList(), sound.turnOnPreset, sound.defaultTurnOnPreset, function(value)
+      sound:setTurnOnPreset(value)
+      sound:playTurnOn()
+
+      self:save()
+    end)
+
+    self.nativeSettings.addSelectorString(self.path .. self.sections.sound.path, 'Turn Off Preset', 'Description', sound:toList(), sound.turnOffPreset, sound.defaultTurnOffPreset, function(value)
+      sound:setTurnOffPreset(value)
+      sound:playTurnOff()
+
+      self:save()
+    end)
   end,
 
   load = function (self)
@@ -153,6 +168,9 @@ settings = {
       color:setRed(self.lightColorRed)
       color:setGreen(self.lightColorGreen)
       color:setBlue(self.lightColorBlue)
+
+      sound:setTurnOnPreset(sound:findIndexByName(self.lightTurnOnSound))
+      sound:setTurnOffPreset(sound:findIndexByName(self.lightTurnOffSound))
     end
   end,
 
@@ -169,7 +187,9 @@ settings = {
         lightBlendPercent = lightBeam.blendPercent,
         lightColorRed = selectedLightColor.red,
         lightColorGreen = selectedLightColor.green,
-        lightColorBlue = selectedLightColor.blue
+        lightColorBlue = selectedLightColor.blue,
+        lightTurnOnSound = sound.selectedTurnOn,
+        lightTurnOffSound = sound.selectedTurnOff
       }))
 
       file:close()
