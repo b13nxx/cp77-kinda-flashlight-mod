@@ -70,22 +70,27 @@ color = {
     self.defaultPreset = 3
     self.preset = self.defaultPreset
 
-    self.selectedRed = self:getByIndex(self.preset).red
-    self.selectedGreen = self:getByIndex(self.preset).green
-    self.selectedBlue = self:getByIndex(self.preset).blue
+    local presetColor = self:getByIndex(self.preset)
+    self.selectedRed = presetColor.red
+    self.selectedGreen = presetColor.green
+    self.selectedBlue = presetColor.blue
 
     self.options = {}
   end,
 
-  builtFrom = function(self, red, green, blue)
-    return Color.new({ Red = red, Green = green, Blue = blue, Alpha = 1 })
+  isStateDirty = function(self, color)
+    return not self:isEqualTo(color)
   end,
 
   isEqualTo = function(self, color)
     return self.selectedRed == color.Red and self.selectedGreen == color.Green and self.selectedBlue == color.Blue
   end,
 
-  getNames = function(self)
+  builtFrom = function(self, red, green, blue)
+    return Color.new({ Red = red, Green = green, Blue = blue, Alpha = 1 })
+  end,
+
+  toList = function(self)
     return { table.unpack(self.presets, 1, 10) }
   end,
 

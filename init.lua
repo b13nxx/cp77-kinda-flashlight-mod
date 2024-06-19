@@ -1,9 +1,10 @@
 require 'src/core/utils'
 require 'src/core/debug'
 require 'src/core/enums'
-require 'src/core/color'
 require 'src/core/vector'
 require 'src/core/player'
+require 'src/core/color'
+require 'src/core/lightBeam'
 
 require 'src/flashlight'
 require 'src/settings'

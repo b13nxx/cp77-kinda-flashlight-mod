@@ -101,11 +101,11 @@ flashlight = {
   despawn = function (self)
     if self.entityStatus == FlashlightStatus.SPAWNED then
       self:playTurnOffSound()
-  
+
       self.entityStatus = FlashlightStatus.DESPAWNING
-  
+
       exEntitySpawner.Despawn(self.entity)
-  
+
       self.drawnWeapon = nil
       self.entityId = nil
       self.entity = nil
@@ -144,16 +144,12 @@ flashlight = {
   calibrate = function (self)
     if self.light ~= nil and self.lightStatus == LightStatus.ON then
       local lightSettings = self.light:GetCurrentSettings()
-      local isLightStateDirty = lightSettings.strength ~= settings.lightPower or
-        lightSettings.radius ~= settings.lightDistance or
-        lightSettings.innerAngle ~= settings.lightBlend or
-        lightSettings.outerAngle ~= settings.lightSize or
-        not color:isEqualTo(lightSettings.color)
+      local isLightStateDirty = lightBeam:isStateDirty(lightSettings) or color:isStateDirty(lightSettings.color)
 
       if isLightStateDirty then
-        self:setDistance(settings.lightDistance)
-        self:setPower(settings.lightPower)
-        self:setSize(settings.lightSize, settings.lightBlend)
+        self:setDistance(lightBeam.distance)
+        self:setPower(lightBeam.power)
+        self:setSize(lightBeam.size, lightBeam.blend)
         self:setColor(color:getSelected())
       end
     end

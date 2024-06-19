@@ -1,18 +1,6 @@
 settings = {
   init = function (self, title, version)
-    self.defaultLightDistance = 40
-    self.defaultLightSize = 40
-    self.defaultLightPowerPercent = 50
-    self.defaultLightBlendPercent = 80
-
-    self.lightDistance = self.defaultLightDistance
-    self.lightSize = self.defaultLightSize
-    self.lightPowerPercent = self.defaultLightPowerPercent
-    self.lightBlendPercent = self.defaultLightBlendPercent
-
-    self.lightPower = self:calcLightPower(self.defaultLightPowerPercent)
-    self.lightBlend = self:calcLightBlend(self.defaultLightPowerPercent, self.defaultLightBlendPercent)
-
+    lightBeam:init()
     color:init()
 
     self.filePath = 'settings.json'
@@ -40,16 +28,6 @@ settings = {
     self.nativeSettings.addTab(self.path, title .. ' (' .. version .. ')')
   end,
 
-  calcLightPower = function (self, percent)
-    local multiply = percent / 100
-    return StringToFloat(FloatToStringPrec(16 * multiply, 2))
-  end,
-
-  calcLightBlend = function (self, size, percent)
-    local multiply = percent / 100
-    return size - FloorF(size * multiply)
-  end,
-
   updateLightColorRGB = function (self)
     self.lightColorPresetChanged = true
 
@@ -73,45 +51,36 @@ settings = {
       self.nativeSettings.addSubcategory(self.path .. self.sections[name].path, self.sections[name].title)
     end
 
-    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Distance', 'How far light should travel', 5, 70, 5, self.lightDistance, self.defaultLightDistance, function(value)
-      self.lightDistance = value
+    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Distance', 'How far light should travel', 5, 70, 5, lightBeam.distance, lightBeam.defaultDistance, function(value)
+      lightBeam:setDistance(value)
+
       self:save()
 
-      if flashlight.light ~= nil then
-        flashlight.light:SetRadius(value)
-      end
+      flashlight:setDistance(lightBeam.distance)
     end)
 
-    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Power (%)', 'How strong the light should be', 2, 100, 2, self.lightPowerPercent, self.defaultLightPowerPercent, function(value)
-      self.lightPowerPercent = value
-      self.lightPower = self:calcLightPower(self.lightPowerPercent)
+    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Power (%)', 'How strong the light should be', 2, 100, 2, lightBeam.powerPercent, lightBeam.defaultPowerPercent, function(value)
+      lightBeam:setPowerPercent(value)
+
       self:save()
 
-      print('lightPower', self.lightPower)
-
-      if flashlight.light ~= nil then
-        flashlight.light:SetStrength(self.lightPower)
-      end
+      flashlight:setPower(lightBeam.power)
     end)
 
-    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Size', 'How strong the light should be', 20, 50, 10, self.lightSize, self.defaultLightSize, function(value)
-      self.lightSize = value
-      self.lightBlend = self:calcLightBlend(self.lightSize, self.lightBlendPercent)
+    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Size', 'How strong the light should be', 20, 50, 10, lightBeam.size, lightBeam.defaultSize, function(value)
+      lightBeam:setSize(value)
+
       self:save()
 
-      if flashlight.light ~= nil then
-        flashlight.light:SetAngles(self.lightBlend, self.lightSize)
-      end
+      flashlight:setSize(lightBeam.size, lightBeam.blend)
     end)
 
-    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Blend (%)', 'How strong the light should be', 40, 80, 10, self.lightBlendPercent, self.defaultLightBlendPercent, function(value)
-      self.lightBlendPercent = value
-      self.lightBlend = self:calcLightBlend(self.lightSize, self.lightBlendPercent)
+    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Blend (%)', 'How strong the light should be', 40, 80, 10, lightBeam.blendPercent, lightBeam.defaultBlendPercent, function(value)
+      lightBeam:setBlendPercent(value)
+
       self:save()
 
-      if flashlight.light ~= nil then
-        flashlight.light:SetAngles(self.lightBlend, self.lightSize)
-      end
+      flashlight:setSize(lightBeam.size, lightBeam.blend)
     end)
 
 
@@ -119,9 +88,9 @@ settings = {
     local selectedLightColor = color:getSelected()
     local defaultLightColor = color:getDefault()
 
-    color.options.preset = self.nativeSettings.addSelectorString(self.path .. self.sections.color.path, 'Preset', 'Description', color:getNames(), color.preset, color.defaultPreset, function(value)
+    color.options.preset = self.nativeSettings.addSelectorString(self.path .. self.sections.color.path, 'Preset', 'Description', color:toList(), color.preset, color.defaultPreset, function(value)
       color:setPreset(value)
-      
+
       self:updateLightColorRGB()
       self:save()
 
@@ -158,7 +127,7 @@ settings = {
 
   load = function (self)
     local file = io.open(self.filePath, 'r')
-  
+
     if not file then
       return self:save()
     end
@@ -176,8 +145,10 @@ settings = {
         --end
       end
 
-      self.lightPower = self:calcLightPower(self.lightPowerPercent)
-      self.lightBlend = self:calcLightBlend(self.lightSize, self.lightBlendPercent)
+      lightBeam:setDistance(self.lightDistance)
+      lightBeam:setSize(self.lightSize)
+      lightBeam:setPowerPercent(self.lightPowerPercent)
+      lightBeam:setBlendPercent(self.lightBlendPercent)
 
       color:setRed(self.lightColorRed)
       color:setGreen(self.lightColorGreen)
@@ -192,10 +163,10 @@ settings = {
       local selectedLightColor = color:getSelected()
 
       file:write(json.encode({
-        lightDistance = self.lightDistance,
-        lightSize = self.lightSize,
-        lightPowerPercent = self.lightPowerPercent,
-        lightBlendPercent = self.lightBlendPercent,
+        lightDistance = lightBeam.distance,
+        lightSize = lightBeam.size,
+        lightPowerPercent = lightBeam.powerPercent,
+        lightBlendPercent = lightBeam.blendPercent,
         lightColorRed = selectedLightColor.red,
         lightColorGreen = selectedLightColor.green,
         lightColorBlue = selectedLightColor.blue
