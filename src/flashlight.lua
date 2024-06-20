@@ -46,40 +46,41 @@ flashlight = {
 
     local spawnTransform = WorldTransform.new()
     local spawnPos = nil
-    local spawnAngle = nil
+    local spawnRot = nil
 
     if self.entityStatus == FlashlightStatus.SPAWNED then
       local muzzleTransform = self.drawnWeapon:GetMuzzleSlotWorldTransform()
-      local muzzlePos = Transform.GetPosition(muzzleTransform)
-      local muzzleAngle = Transform.ToEulerAngles(muzzleTransform)
-      local forwardDir = vector:multiplyByScalar(self.drawnWeapon:GetWorldForward(), 0.1)
-      local upDir = vector:multiplyByScalar(self.drawnWeapon:GetWorldUp(), 0.2)
-      local direction = vector:add(forwardDir, upDir)
+      local muzzlePos = muzzleTransform:GetPosition()
+      local muzzleRot = muzzleTransform:GetOrientation()
 
-      spawnPos = vector:add(muzzlePos, direction)
-      spawnAngle = EulerAngles.new(muzzleAngle.pitch, 0, muzzleAngle.yaw - 90)
+      local forwardDir = operator:mulVectorByScalar(muzzleTransform:GetForward(), 0.1)
+      local upDir = operator:mulVectorByScalar(muzzleTransform:GetUp(), 0.03)
+      local direction = operator:addVectors(forwardDir, upDir)
+
+      spawnPos = operator:addVectors(muzzlePos, direction)
+      spawnRot = operator:rotQuatByZ(muzzleRot, -90)
     elseif self.entityStatus == FlashlightStatus.SPAWNING then
       local playerPos = Game.GetPlayer():GetWorldPosition()
 
       spawnPos = Vector4.new(playerPos.x, playerPos.y, playerPos.z - 5, playerPos.w)
-      spawnAngle = EulerAngles.new(0, 0, 0)
+      spawnRot = Quaternion.new()
     end
 
-    WorldTransform.SetPosition(spawnTransform, spawnPos)
-    WorldTransform.SetOrientationEuler(spawnTransform, spawnAngle)
+    spawnTransform:SetPosition(spawnPos)
+    spawnTransform:SetOrientation(spawnRot)
 
     return {
       transform = spawnTransform,
       pos = spawnPos,
-      angle = spawnAngle
+      rot = spawnRot
     }
   end,
 
   spawn = function (self)
     if self.entityStatus == FlashlightStatus.DESPAWNED then
-      sound:playTurnOn()
-
       self.entityStatus = FlashlightStatus.SPAWNING
+
+      sound:playTurnOn()
 
       local spawnPoint = self:getSpawnPoint()
       self.entityId = exEntitySpawner.Spawn(self.path, spawnPoint.transform)
@@ -88,9 +89,9 @@ flashlight = {
 
   despawn = function (self)
     if self.entityStatus == FlashlightStatus.SPAWNED then
-      sound:playTurnOff()
-
       self.entityStatus = FlashlightStatus.DESPAWNING
+
+      sound:playTurnOff()
 
       exEntitySpawner.Despawn(self.entity)
 
@@ -125,7 +126,7 @@ flashlight = {
   move = function (self)
     if self.entityStatus == FlashlightStatus.SPAWNED then
       local spawnPoint = self:getSpawnPoint()
-      Game.GetTeleportationFacility():Teleport(self.entity, spawnPoint.pos, spawnPoint.angle)
+      Game.GetTeleportationFacility():Teleport(self.entity, spawnPoint.pos, spawnPoint.rot:ToEulerAngles())
     end
   end,
 

@@ -9,7 +9,7 @@ color = {
       ['240, 230, 140'] = 7,
       ['238, 130, 238'] = 8,
       ['244, 164, 96'] = 9,
-      ['255, 192, 203'] = 10,
+      ['255, 105, 180'] = 10,
       [1] = 'Custom',
       [2] = 'White',
       [3] = 'MistyRose',
@@ -19,7 +19,7 @@ color = {
       [7] = 'Khaki',
       [8] = 'Violet',
       [9] = 'SandyBrown',
-      [10] = 'Pink',
+      [10] = 'HotPink',
       White = {
         red = 255,
         green = 255,
@@ -60,10 +60,10 @@ color = {
         green = 164,
         blue = 96
       },
-      Pink = {
+      HotPink = {
         red = 255,
-        green = 192,
-        blue = 203
+        green = 105,
+        blue = 180
       }
     }
 

@@ -1,7 +1,7 @@
 require 'src/core/utils'
 require 'src/core/debug'
 require 'src/core/enums'
-require 'src/core/vector'
+require 'src/core/operator'
 require 'src/core/player'
 
 require 'src/core/color'
