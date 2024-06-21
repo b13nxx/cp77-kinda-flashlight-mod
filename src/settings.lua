@@ -52,7 +52,7 @@ settings = {
       self.nativeSettings.addSubcategory(self.path .. self.sections[name].path, self.sections[name].title)
     end
 
-    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Distance', 'How far light should travel', 5, 70, 5, lightBeam.distance, lightBeam.defaultDistance, function(value)
+    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Distance', 'How far traveled should the light be?', 5, 70, 5, lightBeam.distance, lightBeam.defaultDistance, function(value)
       lightBeam:setDistance(value)
 
       self:save()
@@ -60,7 +60,7 @@ settings = {
       flashlight:setDistance(lightBeam.distance)
     end)
 
-    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Power (%)', 'How strong the light should be', 2, 100, 2, lightBeam.powerPercent, lightBeam.defaultPowerPercent, function(value)
+    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Power (%)', 'How strong should the light be?', 2, 100, 2, lightBeam.powerPercent, lightBeam.defaultPowerPercent, function(value)
       lightBeam:setPowerPercent(value)
 
       self:save()
@@ -68,7 +68,7 @@ settings = {
       flashlight:setPower(lightBeam.power)
     end)
 
-    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Size', 'How strong the light should be', 20, 50, 10, lightBeam.size, lightBeam.defaultSize, function(value)
+    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Size', 'How big should the light be?', 20, 50, 10, lightBeam.size, lightBeam.defaultSize, function(value)
       lightBeam:setSize(value)
 
       self:save()
@@ -76,7 +76,7 @@ settings = {
       flashlight:setSize(lightBeam.size, lightBeam.blend)
     end)
 
-    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Blend (%)', 'How strong the light should be', 40, 80, 10, lightBeam.blendPercent, lightBeam.defaultBlendPercent, function(value)
+    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Blend (%)', 'How blended should the light be?', 40, 80, 10, lightBeam.blendPercent, lightBeam.defaultBlendPercent, function(value)
       lightBeam:setBlendPercent(value)
 
       self:save()
@@ -89,7 +89,7 @@ settings = {
     local selectedLightColor = color:getSelected()
     local defaultLightColor = color:getDefault()
 
-    color.options.preset = self.nativeSettings.addSelectorString(self.path .. self.sections.color.path, 'Preset', 'Description', color:toList(), color.preset, color.defaultPreset, function(value)
+    color.options.preset = self.nativeSettings.addSelectorString(self.path .. self.sections.color.path, 'Preset', ' Preset to choose the color you want the light to be', color:toList(), color.preset, color.defaultPreset, function(value)
       color:setPreset(value)
 
       self:updateLightColorRGB()
@@ -98,7 +98,7 @@ settings = {
       flashlight:setColor(color:getSelected())
     end)
 
-    color.options.red = self.nativeSettings.addRangeInt(self.path .. self.sections.color.path, 'Red', 'Description', 0, 255, 1, selectedLightColor.red, defaultLightColor.red, function(value)
+    color.options.red = self.nativeSettings.addRangeInt(self.path .. self.sections.color.path, 'Red', 'Intensity of the red', 0, 255, 1, selectedLightColor.red, defaultLightColor.red, function(value)
       color:setRed(value)
 
       self:updateLightColorPreset()
@@ -107,7 +107,7 @@ settings = {
       flashlight:setColor(color:getSelected())
     end)
 
-    color.options.green = self.nativeSettings.addRangeInt(self.path .. self.sections.color.path, 'Green', 'Description', 0, 255, 1, selectedLightColor.green, defaultLightColor.green, function(value)
+    color.options.green = self.nativeSettings.addRangeInt(self.path .. self.sections.color.path, 'Green', 'Intensity of the green', 0, 255, 1, selectedLightColor.green, defaultLightColor.green, function(value)
       color:setGreen(value)
 
       self:updateLightColorPreset()
@@ -116,7 +116,7 @@ settings = {
       flashlight:setColor(color:getSelected())
     end)
 
-    color.options.blue = self.nativeSettings.addRangeInt(self.path .. self.sections.color.path, 'Blue', 'Description', 0, 255, 1, selectedLightColor.blue, defaultLightColor.blue, function(value)
+    color.options.blue = self.nativeSettings.addRangeInt(self.path .. self.sections.color.path, 'Blue', 'Intensity of the blue', 0, 255, 1, selectedLightColor.blue, defaultLightColor.blue, function(value)
       color:setBlue(value)
 
       self:updateLightColorPreset()
@@ -125,14 +125,14 @@ settings = {
       flashlight:setColor(color:getSelected())
     end)
 
-    self.nativeSettings.addSelectorString(self.path .. self.sections.sound.path, 'Turn On Preset', 'Description', sound:toList(), sound.turnOnPreset, sound.defaultTurnOnPreset, function(value)
+    self.nativeSettings.addSelectorString(self.path .. self.sections.sound.path, 'Turn On Preset', 'Preset to choose the sound you want to play when the flashlight is turned on', sound:toList(), sound.turnOnPreset, sound.defaultTurnOnPreset, function(value)
       sound:setTurnOnPreset(value)
       sound:playTurnOn()
 
       self:save()
     end)
 
-    self.nativeSettings.addSelectorString(self.path .. self.sections.sound.path, 'Turn Off Preset', 'Description', sound:toList(), sound.turnOffPreset, sound.defaultTurnOffPreset, function(value)
+    self.nativeSettings.addSelectorString(self.path .. self.sections.sound.path, 'Turn Off Preset', 'Preset to choose the sound you want to play when the flashlight is turned off', sound:toList(), sound.turnOffPreset, sound.defaultTurnOffPreset, function(value)
       sound:setTurnOffPreset(value)
       sound:playTurnOff()
 
@@ -147,7 +147,7 @@ settings = {
       return self:save()
     end
 
-    local content = file:read('*a');
+    local content = file:read('*a')
 
     if content ~= '' then
       local jsonData = json.decode(content)
