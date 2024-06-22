@@ -13,7 +13,7 @@ player = {
     return Game.GetPlayer():GetMountedVehicle() ~= nil
   end,
 
-  getActivePlayerWeapon = function (self)
+  getActiveWeapon = function (self)
     return Game.GetActiveWeapon(Game.GetPlayer())
   end
 }

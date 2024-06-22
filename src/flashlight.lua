@@ -1,6 +1,5 @@
 flashlight = {
   init = function (self)
-    self.drawnWeapon = player:getActivePlayerWeapon()
     self.colliderCName = CName.new('Collider')
     self.meshCName = CName.new('Mesh0371')
     self.lightCName = CName.new('Light1460')
@@ -12,11 +11,10 @@ flashlight = {
     self.entityStatus = FlashlightStatus.DESPAWNED
     self.lightStatus = LightStatus.OFF
     self.disableColl = true
-    self.disableVisib = false
+    self.disableVisib = true
   end,
 
   destroy = function (self)
-    self.drawnWeapon = nil
     self.colliderCName = nil
     self.meshCName = nil
     self.lightCName = nil
@@ -40,40 +38,15 @@ flashlight = {
   end,
 
   getSpawnPoint = function (self)
-    if self.drawnWeapon == nil then
-      return
-    end
-
     local spawnTransform = WorldTransform.new()
-    local spawnPos = nil
-    local spawnRot = nil
 
-    if self.entityStatus == FlashlightStatus.SPAWNED then
-      local muzzleTransform = self.drawnWeapon:GetMuzzleSlotWorldTransform()
-      local muzzlePos = muzzleTransform:GetPosition()
-      local muzzleRot = muzzleTransform:GetOrientation()
-
-      local forwardDir = operator:mulVectorByScalar(muzzleTransform:GetForward(), 0.1)
-      local upDir = operator:mulVectorByScalar(muzzleTransform:GetUp(), 0.03)
-      local direction = operator:addVectors(forwardDir, upDir)
-
-      spawnPos = operator:addVectors(muzzlePos, direction)
-      spawnRot = operator:rotQuatByZ(muzzleRot, -90)
-    elseif self.entityStatus == FlashlightStatus.SPAWNING then
-      local playerPos = Game.GetPlayer():GetWorldPosition()
-
-      spawnPos = Vector4.new(playerPos.x, playerPos.y, playerPos.z - 5, playerPos.w)
-      spawnRot = Quaternion.new()
-    end
+    spawnPos = operator:sumVectors(operator:getUpVec(0.03), operator:getForwardVec(0.8))
+    spawnRot = operator:getUpQuat(-90)
 
     spawnTransform:SetPosition(spawnPos)
     spawnTransform:SetOrientation(spawnRot)
 
-    return {
-      transform = spawnTransform,
-      pos = spawnPos,
-      rot = spawnRot
-    }
+    return spawnTransform
   end,
 
   spawn = function (self)
@@ -82,8 +55,7 @@ flashlight = {
 
       sound:playTurnOn()
 
-      local spawnPoint = self:getSpawnPoint()
-      self.entityId = exEntitySpawner.Spawn(self.path, spawnPoint.transform)
+      self.entityId = exEntitySpawner.Spawn(self.path, self:getSpawnPoint())
     end
   end,
 
@@ -95,7 +67,6 @@ flashlight = {
 
       exEntitySpawner.Despawn(self.entity)
 
-      self.drawnWeapon = nil
       self.entityId = nil
       self.entity = nil
       self.light = nil
@@ -116,6 +87,8 @@ flashlight = {
         self.light = self.entity:FindComponentByName(self.lightCName)
 
         if self.light ~= nil then
+          self:bindToPlayerWeapon()
+
           self.entityStatus = FlashlightStatus.SPAWNED
           self.lightStatus = LightStatus.ON
         end
@@ -123,19 +96,18 @@ flashlight = {
     end
   end,
 
-  move = function (self)
-    if self.entityStatus == FlashlightStatus.SPAWNED then
-      local spawnPoint = self:getSpawnPoint()
-      Game.GetTeleportationFacility():Teleport(self.entity, spawnPoint.pos, spawnPoint.rot:ToEulerAngles())
+  isStateDirty = function (self)
+    if self.light == nil then
+      return false
     end
+
+    local lightSettings = self.light:GetCurrentSettings()
+    return lightBeam:isStateDirty(lightSettings) or color:isStateDirty(lightSettings.color)
   end,
 
   calibrate = function (self)
     if self.light ~= nil and self.lightStatus == LightStatus.ON then
-      local lightSettings = self.light:GetCurrentSettings()
-      local isLightStateDirty = lightBeam:isStateDirty(lightSettings) or color:isStateDirty(lightSettings.color)
-
-      if isLightStateDirty then
+      if self:isStateDirty() then
         self:setDistance(lightBeam.distance)
         self:setPower(lightBeam.power)
         self:setSize(lightBeam.size, lightBeam.blend)
@@ -144,14 +116,22 @@ flashlight = {
     end
   end,
 
+  bindToPlayerWeapon = function (self)
+    local playerWeapon = player:getActiveWeapon()
+
+    if self.entity ~= nil and playerWeapon ~= nil then
+      EntityGameInterface.UnbindTransform(self.entity:GetEntity())
+      EntityGameInterface.BindToComponent(self.entity:GetEntity(), playerWeapon:GetEntity(), CName.new('SlotComponent'), CName.new('Receiver'), false)
+    end
+  end,
+
   switch = function (self)
     local isActivelyPlaying = player:checkIfActivelyPlaying()
     local isInsideVehicle = player:checkIfInsideVehicle()
+    local playerWeapon = player:getActiveWeapon()
 
-    self.drawnWeapon = player:getActivePlayerWeapon()
-
-    if not isInsideVehicle and isActivelyPlaying and self.drawnWeapon ~= nil then
-      if self.entityStatus == FlashlightStatus.DESPAWNED and not self.drawnWeapon:IsMelee() then
+    if not isInsideVehicle and isActivelyPlaying and playerWeapon ~= nil and not playerWeapon:IsMelee() then
+      if self.entityStatus == FlashlightStatus.DESPAWNED then
         self:spawn()
       elseif self.entityStatus == FlashlightStatus.SPAWNED then
         self:despawn()

@@ -31,11 +31,13 @@ registerForEvent('onInit', function()
   flashlight:init()
 
   ObserveAfter('PlayerPuppet', 'OnWeaponEquipEvent', function(self)
-    flashlight.drawnWeapon = player:getActivePlayerWeapon()
+    local playerWeapon = player:getActiveWeapon()
 
-    if not flashlight.drawnWeapon:IsMelee() then
+    flashlight:bindToPlayerWeapon()
+
+    if not playerWeapon:IsMelee() then
       flashlight:turnOn()
-    elseif flashlight.drawnWeapon:IsMelee() then
+    elseif playerWeapon:IsMelee() then
       flashlight:turnOff()
     end
   end)
@@ -62,12 +64,11 @@ end)
 registerForEvent('onUpdate', function(delta)
   private.passedTime = private.passedTime + delta
 
-  if private.passedTime > 0.033 then
+  if private.passedTime > 0.5 then
     private.passedTime = 0
 
     flashlight:findEntity()
     flashlight:calibrate()
-    flashlight:move()
   end
 end)
 
