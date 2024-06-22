@@ -10,7 +10,7 @@ require 'src/core/lightBeam'
 require 'src/core/sound'
 
 require 'src/flashlight'
-require 'src/settings'
+require 'src/settingsScreen'
 
 public = {
   isReady = false,
@@ -26,9 +26,9 @@ private = {
 registerForEvent('onInit', function()
   public.isReady = true
 
-  settings:init(public.title, public.version)
-  settings:load()
-  settings:draw()
+  settingsScreen:init(public.title, public.version)
+  settingsScreen:load()
+  settingsScreen:draw()
 
   flashlight:init()
 
@@ -98,9 +98,9 @@ registerForEvent('onUpdate', function(delta)
       flashlight:findEntity()
     end
 
-    -- if sound.requestPlayTurnOn > 0 or sound.requestPlayTurnOff > 0 then
-    --   sound:checkPlayRequests(private.tickTime)
-    -- end
+    if sound.requestPlayTurnOn > 0 or sound.requestPlayTurnOff > 0 then
+      sound:checkPlayRequests(private.tickTime)
+    end
 
     flashlight:calibrate()
   end
@@ -115,7 +115,7 @@ end)
 registerForEvent('onShutdown', function()
   flashlight:despawn()
   flashlight:destroy()
-  settings:destroy()
+  settingsScreen:destroy()
 end)
 
 return public
