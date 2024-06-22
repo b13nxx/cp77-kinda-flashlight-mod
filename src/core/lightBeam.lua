@@ -45,8 +45,6 @@ lightBeam = {
   setPowerPercent = function (self, percent)
     self.powerPercent = percent
     self.power = self:calcPower(self.powerPercent)
-
-    print('power is', self.power)
   end,
 
   setBlendPercent = function (self, percent)

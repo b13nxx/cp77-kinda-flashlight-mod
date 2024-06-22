@@ -24,8 +24,6 @@ private = {
 }
 
 registerForEvent('onInit', function()
-  public.isReady = true
-
   settingsScreen:init(public.title, public.version)
   settingsScreen:load()
   settingsScreen:draw()
@@ -86,6 +84,8 @@ registerForEvent('onInit', function()
   end)
 
   print('KRF is initialized!')
+
+  public.isReady = true
 end)
 
 registerForEvent('onUpdate', function(delta)
