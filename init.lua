@@ -18,7 +18,8 @@ public = {
 }
 
 private = {
-  passedTime = 0
+  passedTime = 0,
+  tickTime = 0.5
 }
 
 registerForEvent('onInit', function()
@@ -64,10 +65,17 @@ end)
 registerForEvent('onUpdate', function(delta)
   private.passedTime = private.passedTime + delta
 
-  if private.passedTime > 0.5 then
+  if private.passedTime > private.tickTime then
     private.passedTime = 0
 
-    flashlight:findEntity()
+    if flashlight.entityStatus ~= FlashlightStatus.SPAWNED then
+      flashlight:findEntity()
+    end
+
+    if sound.requestPlayTurnOn > 0 or sound.requestPlayTurnOff > 0 then
+      sound:checkPlayRequests(private.tickTime)
+    end
+
     flashlight:calibrate()
   end
 end)

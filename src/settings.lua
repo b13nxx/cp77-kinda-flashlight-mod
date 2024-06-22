@@ -52,7 +52,7 @@ settings = {
       self.nativeSettings.addSubcategory(self.path .. self.sections[name].path, self.sections[name].title)
     end
 
-    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Distance', 'How far traveled should the light be?', 5, 70, 5, lightBeam.distance, lightBeam.defaultDistance, function(value)
+    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Distance', 'How far traveled should the light be?', 5, 100, 5, lightBeam.distance, lightBeam.defaultDistance, function(value)
       lightBeam:setDistance(value)
 
       self:save()
@@ -125,16 +125,16 @@ settings = {
       flashlight:setColor(color:getSelected())
     end)
 
-    self.nativeSettings.addSelectorString(self.path .. self.sections.sound.path, 'Turn On Preset', 'Preset to choose the sound you want to play when the flashlight is turned on', sound:toList(), sound.turnOnPreset, sound.defaultTurnOnPreset, function(value)
+    self.nativeSettings.addSelectorString(self.path .. self.sections.sound.path, 'Turn On', 'Sound to be played when the flashlight is turned on (wait 1 sec to hear an example)', sound:toList(), sound.turnOnPreset, sound.defaultTurnOnPreset, function(value)
       sound:setTurnOnPreset(value)
-      sound:playTurnOn()
+      sound:playTurnOn(1)
 
       self:save()
     end)
 
-    self.nativeSettings.addSelectorString(self.path .. self.sections.sound.path, 'Turn Off Preset', 'Preset to choose the sound you want to play when the flashlight is turned off', sound:toList(), sound.turnOffPreset, sound.defaultTurnOffPreset, function(value)
+    self.nativeSettings.addSelectorString(self.path .. self.sections.sound.path, 'Turn Off', 'Sound to be played when the flashlight is turned off (wait 1 sec to hear an example)', sound:toList(), sound.turnOffPreset, sound.defaultTurnOffPreset, function(value)
       sound:setTurnOffPreset(value)
-      sound:playTurnOff()
+      sound:playTurnOff(1)
 
       self:save()
     end)

@@ -1,11 +1,11 @@
 lightBeam = {
   init = function (self)
-    self.maxPower = 16
+    self.maxPower = 32
 
-    self.defaultDistance = 40
-    self.defaultSize = 40
+    self.defaultDistance = 60
+    self.defaultSize = 30
     self.defaultPowerPercent = 50
-    self.defaultBlendPercent = 80
+    self.defaultBlendPercent = 40
 
     self.distance = self.defaultDistance
     self.size = self.defaultSize
