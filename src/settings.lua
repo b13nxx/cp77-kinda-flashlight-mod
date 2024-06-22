@@ -1,5 +1,6 @@
 settings = {
   init = function (self, title, version)
+    generalOptions:init()
     lightBeam:init()
     color:init()
     sound:init()
@@ -9,9 +10,14 @@ settings = {
     self.lightColorPresetChanged = false
     self.path = '/KRF'
     self.sections = {
-      [1] = 'lightBeam',
-      [2] = 'color',
-      [3] = 'sound',
+      [1] = 'general',
+      [2] = 'lightBeam',
+      [3] = 'color',
+      [4] = 'sound',
+      general = {
+        path = '/general',
+        title = 'General'
+      },
       lightBeam = {
         path = '/lightBeam',
         title = 'Light Beam'
@@ -51,6 +57,18 @@ settings = {
     for _, name in ipairs(self.sections) do
       self.nativeSettings.addSubcategory(self.path .. self.sections[name].path, self.sections[name].title)
     end
+
+    self.nativeSettings.addSwitch(self.path .. self.sections.general.path, 'Keep The Weapon Ready', 'Keep the weapon ready when the flashlight is turned on', generalOptions.keepWeaponReady, generalOptions.defaultKeepWeaponReady, function(state)
+      generalOptions:setKeepWeaponReady(state)
+
+      if flashlight.entityStatus == FlashlightStatus.SPAWNED and generalOptions.keepWeaponReady then
+        flashlight:togglePlayerWeaponReadyState(true)
+      elseif not generalOptions.keepWeaponReady then
+        flashlight:togglePlayerWeaponReadyState(false)
+      end
+
+      self:save()
+    end)
 
     self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Distance', 'How far traveled should the light be?', 5, 100, 5, lightBeam.distance, lightBeam.defaultDistance, function(value)
       lightBeam:setDistance(value)
@@ -181,6 +199,7 @@ settings = {
       local selectedLightColor = color:getSelected()
 
       file:write(json.encode({
+        keepWeaponReady = generalOptions.keepWeaponReady,
         lightDistance = lightBeam.distance,
         lightSize = lightBeam.size,
         lightPowerPercent = lightBeam.powerPercent,

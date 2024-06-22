@@ -4,6 +4,7 @@ require 'src/core/enums'
 require 'src/core/operator'
 require 'src/core/player'
 
+require 'src/core/generalOptions'
 require 'src/core/color'
 require 'src/core/lightBeam'
 require 'src/core/sound'
@@ -31,6 +32,25 @@ registerForEvent('onInit', function()
 
   flashlight:init()
 
+  ObserveAfter('UpperBodyEventsTransition', 'UpdateSwitchItem', function(self, timeDelta, stateContext)
+    if flashlight.stateContext ~= nil then return end
+    flashlight:setStateContext(stateContext)
+  end)
+
+  ObserveAfter('SwimmingSurfaceDecisions', 'EnterCondition', function(self, stateContext)
+    if flashlight.stateContext ~= nil then return end
+    flashlight:setStateContext(stateContext)
+  end)
+
+  ObserveAfter('SwimmingTransitionDecisions', 'EnterCondition', function(self, stateContext)
+    if flashlight.stateContext ~= nil then return end
+    flashlight:setStateContext(stateContext)
+  end)
+
+  -- ObserveBefore('PublicSafeDecisions', 'EnterCondition', function(self, stateContext)
+  --   print('PublicSafeDecisions EnterCondition', stateContext:GetBoolParameter(CName.new('ForceReadyState'), true))
+  -- end)
+
   Observe('PlayerPuppet', 'OnDetach', function(self)
     if not self:IsReplacer() then
       flashlight:despawn()
@@ -54,7 +74,7 @@ registerForEvent('onInit', function()
   end)
 
   Observe('UpperBodyTransition', 'SetWeaponHolster', function (self, _scriptInterface, isHolstered)
-    if isHolstered == true then
+    if isHolstered then
       flashlight:turnOff()
     end
   end)
@@ -78,9 +98,9 @@ registerForEvent('onUpdate', function(delta)
       flashlight:findEntity()
     end
 
-    if sound.requestPlayTurnOn > 0 or sound.requestPlayTurnOff > 0 then
-      sound:checkPlayRequests(private.tickTime)
-    end
+    -- if sound.requestPlayTurnOn > 0 or sound.requestPlayTurnOff > 0 then
+    --   sound:checkPlayRequests(private.tickTime)
+    -- end
 
     flashlight:calibrate()
   end

@@ -3,9 +3,11 @@ flashlight = {
     self.colliderCName = CName.new('Collider')
     self.meshCName = CName.new('Mesh0371')
     self.lightCName = CName.new('Light1460')
+    self.forceReadyStateCName = CName.new('ForceReadyState')
     self.entityId = nil
     self.entity = nil
     self.light = nil
+    self.stateContext = nil
 
     self.path = [[base\gameplay\devices\lighting\industrial\spotlight\spotlight_d_lamp_a_glen_overhang.ent]]
     self.entityStatus = FlashlightStatus.DESPAWNED
@@ -18,15 +20,25 @@ flashlight = {
     self.colliderCName = nil
     self.meshCName = nil
     self.lightCName = nil
+    self.forceReadyStateCName = nil
     self.entityId = nil
     self.entity = nil
     self.light = nil
+    self.stateContext = nil
+  end,
+
+  setStateContext = function (self, stateContext)
+    self.stateContext = stateContext
   end,
 
   turnOn = function (self)
     if self.entity ~= nil and self.lightStatus == LightStatus.OFF then
       self.lightStatus = LightStatus.ON
       self.entity:TurnOnLights()
+
+      if generalOptions.keepWeaponReady then
+        self:togglePlayerWeaponReadyState(true)
+      end
     end
   end,
 
@@ -34,6 +46,7 @@ flashlight = {
     if self.entity ~= nil and self.lightStatus == LightStatus.ON then
       self.lightStatus = LightStatus.OFF
       self.entity:TurnOffLights()
+      self:togglePlayerWeaponReadyState(false)
     end
   end,
 
@@ -128,6 +141,12 @@ flashlight = {
     end
   end,
 
+  togglePlayerWeaponReadyState = function (self, state)
+    if self.stateContext ~= nil then
+      self.stateContext:SetPermanentBoolParameter(self.forceReadyStateCName, state, true)
+    end
+  end,
+
   switch = function (self)
     local isActivelyPlaying = player:checkIfActivelyPlaying()
     local isInsideVehicle = player:checkIfInsideVehicle()
@@ -136,8 +155,13 @@ flashlight = {
     if not isInsideVehicle and isActivelyPlaying and playerWeapon ~= nil and not playerWeapon:IsMelee() then
       if self.entityStatus == FlashlightStatus.DESPAWNED then
         self:spawn()
+
+        if generalOptions.keepWeaponReady then
+          self:togglePlayerWeaponReadyState(true)
+        end
       elseif self.entityStatus == FlashlightStatus.SPAWNED then
         self:despawn()
+        self:togglePlayerWeaponReadyState(false)
       end
     end
   end,
