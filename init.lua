@@ -31,6 +31,12 @@ registerForEvent('onInit', function()
 
   flashlight:init()
 
+  Observe('PlayerPuppet', 'OnDetach', function(self)
+    if not self:IsReplacer() then
+      flashlight:despawn()
+    end
+  end)
+
   ObserveAfter('PlayerPuppet', 'OnWeaponEquipEvent', function(self)
     local playerWeapon = player:getActiveWeapon()
 

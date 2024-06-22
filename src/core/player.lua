@@ -6,7 +6,7 @@ player = {
   checkIfActivelyPlaying = function (self)
     local timeSystem = Game.GetTimeSystem()
 
-    return self.checkIfSessionStarted() and not (Game.GetSystemRequestsHandler():IsGamePaused() or timeSystem:IsPausedState() or (timeSystem:IsTimeDilationActive() and timeSystem:GetActiveTimeDilation() < 0.05))
+    return self.checkIfSessionStarted() and not (Game.GetSystemRequestsHandler():IsGamePaused() or (timeSystem:IsTimeDilationActive() and timeSystem:GetActiveTimeDilation() < 0.05))
   end,
 
   checkIfInsideVehicle = function (self)

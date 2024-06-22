@@ -53,9 +53,11 @@ flashlight = {
     if self.entityStatus == FlashlightStatus.DESPAWNED then
       self.entityStatus = FlashlightStatus.SPAWNING
 
-      sound:playTurnOn()
-
       self.entityId = exEntitySpawner.Spawn(self.path, self:getSpawnPoint())
+
+      if self.entityId ~= nil then
+        sound:playTurnOn()
+      end
     end
   end,
 
@@ -63,9 +65,10 @@ flashlight = {
     if self.entityStatus == FlashlightStatus.SPAWNED then
       self.entityStatus = FlashlightStatus.DESPAWNING
 
-      sound:playTurnOff()
-
-      exEntitySpawner.Despawn(self.entity)
+      if self.entity ~= nil then
+        exEntitySpawner.Despawn(self.entity)
+        sound:playTurnOff()
+      end
 
       self.entityId = nil
       self.entity = nil

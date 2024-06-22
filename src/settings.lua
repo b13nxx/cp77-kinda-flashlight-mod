@@ -68,7 +68,7 @@ settings = {
       flashlight:setPower(lightBeam.power)
     end)
 
-    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Size', 'How big should the light be?', 20, 50, 10, lightBeam.size, lightBeam.defaultSize, function(value)
+    self.nativeSettings.addRangeInt(self.path .. self.sections.lightBeam.path, 'Size', 'How big should the light be?', 20, 80, 10, lightBeam.size, lightBeam.defaultSize, function(value)
       lightBeam:setSize(value)
 
       self:save()
